@@ -1801,22 +1801,31 @@ def admin_users():
     
     return render_template('admin_users.html', users=users)
 
+from flask import render_template, make_response
+from datetime import datetime
+
 @app.route('/sitemap.xml')
 def sitemap():
+    # Liste des pages principales, avec les pages supplémentaires
     pages = [
-        '/', '/produits', '/destockage-professionnel',
-        '/guide-destockage-alimentaire', '/nos-fournisseurs',
-        '/blog,/presse'  # Ajoutez toutes vos nouvelles URLs
+        '/', '/contact', '/about', '/produits', '/conditions', '/mentions-legales',  # Ajout des nouvelles pages
+        '/destockage-professionnel', '/guide-destockage-alimentaire', '/nos-fournisseurs',
+        '/blog', '/presse'  # Correction du problème de la virgule
     ]
     
     # Génération dynamique des URLs produits
     for product in products:
         pages.append(f"/produit/{product['id']}")
     
-    sitemap_xml = render_template('sitemap.xml', pages=pages)
+    # Génération du sitemap XML avec la date actuelle
+    sitemap_xml = render_template('sitemap.xml', pages=pages, now=datetime.utcnow())
+    
+    # Création de la réponse HTTP avec le bon type de contenu
     response = make_response(sitemap_xml)
     response.headers['Content-Type'] = 'application/xml'
+    
     return response
+
 
 @app.route('/robots.txt')
 def robots():
